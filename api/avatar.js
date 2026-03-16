@@ -16,7 +16,7 @@ export default function handler(req, res) {
   let file;
 
   if (id) {
-    file = `${id}.png`;
+    file = `AV${id}.png`;
   } else {
     file = files[Math.floor(Math.random() * files.length)];
   }
