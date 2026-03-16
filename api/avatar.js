@@ -2,26 +2,27 @@ export default function handler(req, res) {
 
   const { gender, id } = req.query;
 
+  let folder = "all";
   let avatarId;
 
-  if (id) {
-    avatarId = id;
-  } 
-  else if (gender === "boy") {
-    avatarId = Math.floor(Math.random() * 50) + 1;      // 1-50
-  } 
-  else if (gender === "girl") {
-    avatarId = Math.floor(Math.random() * 50) + 51;     // 51-100
-  } 
-  else {
-    avatarId = Math.floor(Math.random() * 100) + 1;     // 1-100
+  if (gender === "boy") {
+    folder = "boy";
+    avatarId = Math.floor(Math.random() * 50) + 1; // 1-50
   }
 
-  const url = `/avatars/AV${avatarId}.png`;
+  else if (gender === "girl") {
+    folder = "girl";
+    avatarId = Math.floor(Math.random() * 50) + 51; // 51-100
+  }
 
-  res.writeHead(302, {
-    Location: url
-  });
+  else {
+    avatarId = Math.floor(Math.random() * 100) + 1;
+  }
 
+  if (id) avatarId = id;
+
+  const url = `/avatars/${folder}/AV${avatarId}.png`;
+
+  res.writeHead(302, { Location: url });
   res.end();
 }
