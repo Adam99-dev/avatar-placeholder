@@ -3,14 +3,29 @@ import path from "path";
 
 export default function handler(req, res) {
 
-  const folder = path.join(process.cwd(), "avatars/all");
-  const files = fs.readdirSync(folder);
+  const { gender } = req.query;
+
+  let folder = "avatars/all";
+
+  if (gender === "boy") {
+    folder = "avatars/boy";
+  }
+
+  if (gender === "girl") {
+    folder = "avatars/girl";
+  }
+
+  const dir = path.join(process.cwd(), folder);
+
+  const files = fs.readdirSync(dir);
 
   const random = files[Math.floor(Math.random() * files.length)];
 
-  const imagePath = path.join(folder, random);
+  const imagePath = path.join(dir, random);
+
   const image = fs.readFileSync(imagePath);
 
   res.setHeader("Content-Type", "image/png");
+
   res.status(200).send(image);
 }
