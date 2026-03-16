@@ -29,7 +29,7 @@ export default function handler(req, res) {
     avatarId = Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  const url = `/avatars/${folder}/${avatarId}.png`;
+  const url = `/avatars/${folder}/$AV{avatarId}.png`;
 
   res.writeHead(302, {
     Location: url,
