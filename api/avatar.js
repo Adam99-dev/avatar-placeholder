@@ -3,16 +3,14 @@ import path from "path";
 
 export default function handler(req, res) {
 
-  const { id } = req.query;
+  const folder = path.join(process.cwd(), "avatars/all");
+  const files = fs.readdirSync(folder);
 
-  const imagePath = path.join(process.cwd(), "avatars/all", `${id}.png`);
+  const random = files[Math.floor(Math.random() * files.length)];
 
-  if (!fs.existsSync(imagePath)) {
-    return res.status(404).send("Avatar not found");
-  }
-
+  const imagePath = path.join(folder, random);
   const image = fs.readFileSync(imagePath);
 
   res.setHeader("Content-Type", "image/png");
-  res.send(image);
+  res.status(200).send(image);
 }
