@@ -1,32 +1,18 @@
-import fs from "fs";
-import path from "path";
-
 export default function handler(req, res) {
 
-  const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
-  const gender = searchParams.get("gender");
+  const { searchParams } = new URL(req.url, `http://${req.headers.host}`)
 
-  let folder = "avatars/all";
+  const gender = searchParams.get("gender")
 
-  if (gender === "boy") {
-    folder = "avatars/boy";
-  }
+  let folder = "all"
 
-  if (gender === "girl") {
-    folder = "avatars/girl";
-  }
+  if (gender === "boy") folder = "boy"
+  if (gender === "girl") folder = "girl"
 
-  const dir = path.join(process.cwd(), folder);
+  const max = 50   // kitni images hain
+  const random = Math.floor(Math.random() * max) + 1
 
-  const files = fs.readdirSync(dir);
+  const image = `/avatars/${folder}/${random}.png`
 
-  const random = files[Math.floor(Math.random() * files.length)];
-
-  const imagePath = path.join(dir, random);
-
-  const image = fs.readFileSync(imagePath);
-
-  res.setHeader("Content-Type", "image/png");
-
-  res.status(200).send(image);
+  res.redirect(image)
 }
