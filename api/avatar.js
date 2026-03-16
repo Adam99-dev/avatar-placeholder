@@ -1,18 +1,22 @@
 export default function handler(req, res) {
 
-  const { searchParams } = new URL(req.url, `http://${req.headers.host}`)
+  const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
+  const gender = searchParams.get("gender")?.toLowerCase();
 
-  const gender = searchParams.get("gender")
+  let folder = "all";
+  let max = 100;
 
-  let folder = "all"
+  if (gender === "boy") {
+    folder = "boy";
+    max = 50;
+  }
 
-  if (gender === "boy") folder = "boy"
-  if (gender === "girl") folder = "girl"
+  if (gender === "girl") {
+    folder = "girl";
+    max = 50;
+  }
 
-  const max = 50   // kitni images hain
-  const random = Math.floor(Math.random() * max) + 1
+  const random = Math.floor(Math.random() * max) + 1;
 
-  const image = `/avatars/${folder}/${random}.png`
-
-  res.redirect(image)
+  res.redirect(`/avatars/${folder}/${random}.png`);
 }
