@@ -2,13 +2,13 @@ import fs from "fs";
 import path from "path";
 
 export default function handler(req, res) {
-
-  const { gender, id } = req.query;
+  const gender = req.query.gender;
+  const id = req.query.id;
 
   let folder = "all";
 
-  if (gender === "boy") folder = "/boy";
-  if (gender === "girl") folder = "/girl";
+  if (gender === "boy") folder = "boy";
+  if (gender === "girl") folder = "girl";
 
   const avatarFolder = path.join(process.cwd(), "avatars", folder);
   const files = fs.readdirSync(avatarFolder);
