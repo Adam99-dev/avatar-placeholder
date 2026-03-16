@@ -3,7 +3,7 @@ import path from "path";
 
 export default function handler(req, res) {
 
-  const { gender } = req.query;
+  const gender = req.query.gender?.toLowerCase();
 
   let folder = "avatars/all";
 
