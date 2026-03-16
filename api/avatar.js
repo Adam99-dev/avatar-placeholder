@@ -7,8 +7,8 @@ export default function handler(req, res) {
 
   let folder = "all";
 
-  if (gender === "boy") folder = "boy";
-  if (gender === "girl") folder = "girl";
+  if (gender === "boy") folder = "/boy";
+  if (gender === "girl") folder = "/girl";
 
   const avatarFolder = path.join(process.cwd(), "avatars", folder);
   const files = fs.readdirSync(avatarFolder);
