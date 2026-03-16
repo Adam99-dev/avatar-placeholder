@@ -1,5 +1,5 @@
 export default function handler(req, res) {
-  const { gender, id } = req.query;
+  const { gender, id, username } = req.query;   // username bhi support kar sakte ho future mein
 
   let folder = "all";
   let min = 1;
@@ -18,35 +18,26 @@ export default function handler(req, res) {
   let avatarId;
 
   if (id) {
+    // Fixed ID mode (jaise iran.liara wala)
     avatarId = Number(id);
-    if (isNaN(avatarId) || avatarId < min || avatarId > max) {
-      avatarId = Math.floor(Math.random() * (max - min + 1)) + min;
+    if (isNaN(avatarId) || avatarId < 1 || avatarId > 100) {
+      avatarId = Math.floor(Math.random() * 100) + 1; // fallback
     }
   } else {
-    // Random + session-based fix (cookie)
-    const cookieName = `rnd_av_${folder}`;
-    let saved = req.cookies?.[cookieName];
-
-    if (saved && !isNaN(saved)) {
-      avatarId = Number(saved);
-    } else {
-      avatarId = Math.floor(Math.random() * (max - min + 1)) + min;
-      res.setHeader(
-        'Set-Cookie',
-        `${cookieName}=${avatarId}; Path=/; Max-Age=31536000; SameSite=Lax`
-      );
-    }
+    // Pure random har baar (no cookie, taaki refresh pe hamesha naya)
+    avatarId = Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  const file = `/avatars/${folder}/AV${String(avatarId).padStart(2, '0')}.png`;
+  // File name jaise AV01.png, AV42.png etc (2 digit padding)
+  const paddedId = String(avatarId).padStart(2, '0');
+  const url = `/avatars/${folder}/AV${paddedId}.png`;
 
-  // Super strict no-cache headers (Vercel/Cloudflare ke liye bhi)
+  // Headers jo browser/CDN ko force karte hain har baar fresh load karne ke liye
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '0');
-  // Extra: browser ko force karo fresh fetch karne ke liye
-  res.setHeader('Surrogate-Control', 'no-store'); // Cloudflare ke liye
+  res.setHeader('Surrogate-Control', 'no-store'); // Cloudflare/Vercel ke liye
 
-  res.writeHead(302, { Location: file });
+  res.writeHead(302, { Location: url });
   res.end();
 }
