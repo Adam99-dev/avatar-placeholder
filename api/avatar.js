@@ -3,26 +3,38 @@ export default function handler(req, res) {
   const { gender, id } = req.query;
 
   let folder = "all";
-  let avatarId;
+  let min = 1;
+  let max = 100;
 
   if (gender === "boy") {
     folder = "boy";
-    avatarId = Math.floor(Math.random() * 50) + 1; // 1-50
+    min = 1;
+    max = 50;
   }
 
-  else if (gender === "girl") {
+  if (gender === "girl") {
     folder = "girl";
-    avatarId = Math.floor(Math.random() * 50) + 51; // 51-100
+    min = 51;
+    max = 100;
   }
 
+  let avatarId;
+
+  // If ID is given → fixed avatar
+  if (id) {
+    avatarId = id;
+  } 
+  // Otherwise random avatar
   else {
-    avatarId = Math.floor(Math.random() * 100) + 1;
+    avatarId = Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  if (id) avatarId = id;
+  const url = `/avatars/${folder}/${avatarId}.png`;
 
-  const url = `/avatars/${folder}/AV${avatarId}.png`;
+  res.writeHead(302, {
+    Location: url,
+    "Cache-Control": "no-store"
+  });
 
-  res.writeHead(302, { Location: url });
   res.end();
 }
