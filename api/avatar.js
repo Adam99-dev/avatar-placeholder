@@ -1,33 +1,21 @@
-import fs from "fs";
-import path from "path";
-
 export default function handler(req, res) {
-  const gender = req.query.gender;
-  const id = req.query.id;
+
+  const { gender, id } = req.query;
 
   let folder = "all";
 
   if (gender === "boy") folder = "boy";
   if (gender === "girl") folder = "girl";
 
-  const avatarFolder = path.join(process.cwd(), "avatars", folder);
-  const files = fs.readdirSync(avatarFolder);
+  const max = 10; // number of images in each folder
 
-  let file;
+  const avatarId = id || Math.floor(Math.random() * max) + 1;
 
-  if (id) {
-    file = `AV${id}.png`;
-  } else {
-    file = files[Math.floor(Math.random() * files.length)];
-  }
+  const url = `/avatars/${folder}/AV${avatarId}.png`;
 
-  const filePath = path.join(avatarFolder, file);
+  res.writeHead(302, {
+    Location: url
+  });
 
-  if (!fs.existsSync(filePath)) {
-    return res.status(404).send("Avatar not found");
-  }
-
-  const img = fs.readFileSync(filePath);
-  res.setHeader("Content-Type", "image/png");
-  res.send(img);
+  res.end();
 }
