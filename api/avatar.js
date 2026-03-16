@@ -3,7 +3,8 @@ import path from "path";
 
 export default function handler(req, res) {
 
-  const gender = req.query.gender?.toLowerCase();
+  const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
+  const gender = searchParams.get("gender");
 
   let folder = "avatars/all";
 
