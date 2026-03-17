@@ -1,59 +1,82 @@
 const express = require("express");
-const fs = require("fs");
-const path = require("path");
-
 const app = express();
 
+// serve static files (VERY IMPORTANT)
 app.use(express.static("public"));
 
-// read folders
-const boys = fs.readdirSync("./public/avatars/boy").map(f => "boy/" + f);
-const girls = fs.readdirSync("./public/avatars/girl").map(f => "girl/" + f);
-const all = fs.readdirSync("./public/avatars/all").map(f => "all/" + f);
+/*
+📌 CONFIG
+Change these if you add more avatars later
+*/
+const CONFIG = {
+    total: 100,
+    male: { min: 1, max: 50, folder: "boy" },
+    female: { min: 51, max: 100, folder: "girl" },
+    all: { min: 1, max: 100, folder: "all" }
+};
 
 
-// helper function
-function getFolder(gender) {
-    if (gender === "male") return boys;
-    if (gender === "female") return girls;
-    return all; // default
+// 🔹 helper: get config based on gender
+function getConfig(gender) {
+    if (gender === "male") return CONFIG.male;
+    if (gender === "female") return CONFIG.female;
+    return CONFIG.all;
 }
 
 
-// 🔹 RANDOM WITH GENDER
-app.get("/api/avatars/:gender/random", (req, res) => {
-    const gender = req.params.gender.toLowerCase();
-    const list = getFolder(gender);
+// 🔥 1. RANDOM AVATAR (FOR SIGNUP BUTTON)
+app.get("/api/avatars/random", (req, res) => {
+    const gender = req.query.gender;
+    const { min, max, folder } = getConfig(gender);
 
-    const randomAvatar = list[Math.floor(Math.random() * list.length)];
-    res.sendFile(path.join(__dirname, "public/avatars", randomAvatar));
+    const num = Math.floor(Math.random() * (max - min + 1)) + min;
+
+    const avatarUrl = `/avatars/${folder}/AV${num}.png`;
+
+    // prevent caching (important for random)
+    res.set("Cache-Control", "no-store");
+
+    res.json({
+        avatar: avatarUrl
+    });
 });
 
 
-// 🔹 FIXED WITH GENDER + ID
-app.get("/api/avatars/:gender/:id", (req, res) => {
-    const gender = req.params.gender.toLowerCase();
-    const id = req.params.id;
+// 🔥 2. DETERMINISTIC AVATAR (OPTIONAL BACKUP)
+app.get("/api/avatars/generate/:id", (req, res) => {
+    const { id } = req.params;
+    const gender = req.query.gender;
 
-    const list = getFolder(gender);
+    const { min, max, folder } = getConfig(gender);
 
+    // simple hash
     let hash = 0;
     for (let i = 0; i < id.length; i++) {
         hash = id.charCodeAt(i) + ((hash << 5) - hash);
     }
 
-    const index = Math.abs(hash) % list.length;
-    const avatar = list[index];
+    const num = (Math.abs(hash) % (max - min + 1)) + min;
 
-    res.sendFile(path.join(__dirname, "public/avatars", avatar));
+    const avatarUrl = `/avatars/${folder}/AV${num}.png`;
+
+    res.json({
+        avatar: avatarUrl
+    });
 });
 
 
-// 🔹 OPTIONAL (NO GENDER → ALL)
-app.get("/api/avatars/random", (req, res) => {
-    const randomAvatar = all[Math.floor(Math.random() * all.length)];
-    res.sendFile(path.join(__dirname, "public/avatars", randomAvatar));
+// 🔥 3. OPTIONAL: DIRECT IMAGE VIEW (BROWSER)
+app.get("/api/avatars/view/random", (req, res) => {
+    const { min, max, folder } = CONFIG.all;
+
+    const num = Math.floor(Math.random() * (max - min + 1)) + min;
+
+    res.redirect(`/avatars/${folder}/AV${num}.png`);
 });
 
 
-app.listen(3000, () => console.log("Server running on port 3000"));
+// 🔹 start server (local)
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
