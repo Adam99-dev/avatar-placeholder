@@ -4,7 +4,13 @@ const app = express();
 // serve static files
 app.use(express.static("public"));
 
+// view engine
+const ejs = require("ejs");
+app.set("view engine", "ejs");
 
+app.get("/", (req, res)=>{
+    res.render("home");
+})
 // 🔥 RANDOM AVATAR
 app.get("/api/avatars", (req, res) => {
     let { gender } = req.query;
