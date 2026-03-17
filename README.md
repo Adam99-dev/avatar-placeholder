@@ -51,7 +51,7 @@ GET /api/avatars?gender=girl
 | ------ | -------- |
 | boy    | 1 – 50   |
 | girl   | 51 – 100 |
-| none   | 1 – 100  |
+| id     | 1 – 100  |
 
 ---
 
